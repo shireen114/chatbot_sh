@@ -4,6 +4,7 @@ from langchain_community.vectorstores import Chroma
 import gdown
 import os
 import requests
+import zipfile
 
 app = Flask(__name__)
 
@@ -14,21 +15,22 @@ embedding_model = HuggingFaceEmbeddings(
     encode_kwargs={"normalize_embeddings": True}
 )
 
-# تحميل قاعدة البيانات من Google Drive (يجب أن تكون مشاركة عامة)
-folder_url = "https://drive.google.com/drive/folders/1oKtmhfJNdmBfXJwtn4gC0nlezETNr-Kv?usp=sharing"
-local_path = "chroma_dataset"
+zip_url = "https://drive.google.com/file/d/1TRCTZ_txfmdzSfEGr_YXS9h4Kx4ZWNEx/view?usp=sharing"
+zip_path = "chroma_dataset.zip"
+extract_path = "chroma_dataset"
 
-# إنشاء المجلد إذا لم يكن موجوداً
-if not os.path.exists(local_path):
-    os.makedirs(local_path)
-    gdown.download_folder(url=folder_url, output=local_path, quiet=False)
+if not os.path.exists(extract_path):
+    print("Downloading and extracting...")
+    gdown.download(zip_url, zip_path, quiet=False)
 
-# تحميل قاعدة البيانات Chroma
-vector_store = Chroma(
-    persist_directory="chroma_dataset/chroma_bge_db",
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_path)
+    print("Done extracting.")
+ vector_store = Chroma(
+    persist_directory="chroma_dataset",
     embedding_function=embedding_model
 )
-
+   
 retriever = vector_store.as_retriever(
     search_kwargs={"k": 5},
     search_type="mmr"
