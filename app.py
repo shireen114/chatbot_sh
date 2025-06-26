@@ -15,14 +15,14 @@ embedding_model = HuggingFaceEmbeddings(
     encode_kwargs={"normalize_embeddings": True}
 )
 
-# تحميل قاعدة البيانات من Google Drive كملف .zip
-zip_url = "https://drive.google.com/file/d/1TRCTZ_txfmdzSfEGr_YXS9h4Kx4ZWNEx/view?usp=sharing"  # يجب استخدام gdown بصيغة ID
+zip_url = "https://drive.google.com/uc?id=1TRCTZ_txfmdzSfEGr_YXS9h4Kx4ZWNEx"  # رابط تحميل مباشر
 zip_path = "chroma_dataset.zip"
 extract_path = "chroma_dataset"
 
 if not os.path.exists(extract_path):
     print("Downloading and extracting dataset...")
     gdown.download(url=zip_url, output=zip_path, quiet=False)
+
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(extract_path)
     print("Extraction completed.")
@@ -100,4 +100,5 @@ Question:
     return call_llm_api(prompt)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
