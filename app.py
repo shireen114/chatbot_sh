@@ -19,74 +19,21 @@ embedding_model = HuggingFaceEmbeddings(
 )
 print("Embedding model initialized.")
 
-# --- 2. إعداد قاعدة بيانات Chroma ---
-# بيانات تحميل الملف
-zip_url = "https://drive.google.com/uc?id=1TRCTZ_txfmdzSfEGr_YXS9h4Kx4ZWNEx"
-db_directory = "chroma_db"  # اسم المجلد النهائي لقاعدة البيانات
 
-# التحقق إذا كان مجلد قاعدة البيانات غير موجود، ثم نقوم بتحميله وإعداده
+# ✅ تحميل النموذج مرّة واحدة فقط عند تشغيل السيرفر
+print("📦 Loading embedding model once...")
+embedding_model = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-small-en-v1.5",  # نموذج سريع
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True}
+)
+print("✅ Embedding model loaded.")
+
+# قاعدة البيانات (تم تجهيزها مسبقًا)
+db_directory = "chroma_db"
 if not os.path.isdir(db_directory):
-    print(f"Database directory '{db_directory}' not found. Starting download and setup...")
-    temp_zip_path = "chroma_dataset.zip"
-    temp_extract_path = "chroma_dataset_temp"
-
-    # الخطوة أ: تحميل الملف
-    try:
-        print(f"Downloading data from Google Drive...")
-        gdown.download(url=zip_url, output=temp_zip_path, quiet=False)
-        print("Download complete.")
-    except Exception as e:
-        print(f"FATAL ERROR: Failed to download the file: {e}")
-        exit()
-
-    # الخطوة ب: فك ضغط الملف
-    try:
-        print(f"Extracting '{temp_zip_path}' to temporary directory '{temp_extract_path}'...")
-        # التأكد من أن المجلد المؤقت فارغ ونظيف
-        if os.path.exists(temp_extract_path):
-            shutil.rmtree(temp_extract_path)
-        os.makedirs(temp_extract_path)
-
-        with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
-            zip_ref.extractall(temp_extract_path)
-        print("Extraction complete.")
-        # حذف الملف المضغوط بعد الانتهاء منه
-        os.remove(temp_zip_path)
-    except Exception as e:
-        print(f"FATAL ERROR: Failed to extract the zip file: {e}")
-        if os.path.exists(temp_zip_path):
-            os.remove(temp_zip_path) # تنظيف
-        exit()
-
-    # الخطوة ج: البحث عن المجلد الصحيح وإعادة تسميته
-    try:
-        extracted_contents = os.listdir(temp_extract_path)
-        print(f"Contents of temporary directory: {extracted_contents}")
-
-        # إذا كان الملف المضغوط يحتوي على مجلد رئيسي واحد بداخله
-        if len(extracted_contents) == 1 and os.path.isdir(os.path.join(temp_extract_path, extracted_contents[0])):
-            source_path = os.path.join(temp_extract_path, extracted_contents[0])
-            print(f"Detected nested directory: '{source_path}'. Moving it to '{db_directory}'.")
-            shutil.move(source_path, db_directory)
-            shutil.rmtree(temp_extract_path) # حذف المجلد المؤقت الفارغ
-        else:
-            # إذا كانت الملفات مباشرة في المجلد
-            print(f"Data is directly in the root. Moving '{temp_extract_path}' to '{db_directory}'.")
-            shutil.move(temp_extract_path, db_directory)
-
-        print(f"Database successfully placed at '{db_directory}'.")
-    except Exception as e:
-        print(f"FATAL ERROR: Failed to organize the database directory: {e}")
-        exit()
-else:
-    print(f"Database directory '{db_directory}' already exists. Skipping download.")
-
-# --- 3. تحميل قاعدة البيانات إلى Chroma ---
-try:
-    print(f"Loading vector store from: '{db_directory}'...")
-    # تحقق حاسم: هل يحتوي المجلد على الملف الأساسي لـ Chroma؟
-    if not os.path.exists(os.path.join(db_directory, "chroma.sqlite3")):
-         raise FileNotFoundError(f"Chroma database file (chroma.sqlite3) not found in '{db_directory}'. The directory structure is incorrect or the download failed.")
+    print("❌ ERROR: chroma_db not found.")
+    exit()
 
     vector_store = Chroma(
         persist_directory=db_directory,
