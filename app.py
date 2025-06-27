@@ -73,7 +73,7 @@ print("Chroma vector store loaded.")
 # API Key - من الأفضل تحميله من متغيرات البيئة لمزيد من الأمان
 # It's better to load the API key from environment variables for security
 HF_API_KEY = os.getenv("OPENROUTER_API_KEY")
-if "sk-or-v1" in HF_API_KEY:
+if HF_API_KEY and "sk-or-v1" in HF_API_KEY:
     print("Warning: Using a hardcoded API key. Consider using environment variables.")
 
 
