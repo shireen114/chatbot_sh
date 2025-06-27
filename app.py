@@ -54,7 +54,7 @@ retriever = vector_store.as_retriever(
 print("Retriever is ready.")
 
 # --- 4. إعداد API Key ---
-HF_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+HF_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def call_llm_api(prompt: str):
     url = "https://openrouter.ai/api/v1/chat/completions"
