@@ -180,6 +180,6 @@ Question:
     return answer
 
 if __name__ == '__main__':
-    # تأكد من أن debug=False في بيئة الإنتاج
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))  # خذ المنفذ من Render، أو 5000 كخيار بديل
+    app.run(host='0.0.0.0', port=port)
 
