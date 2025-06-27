@@ -106,7 +106,7 @@ print("Retriever is ready.")
 
 # --- 5. إعداد واجهة برمجة التطبيقات (API) للنموذج اللغوي ---
 # انتبه: يجب حماية مفتاح الواجهة البرمجية في بيئة الإنتاج
-HF_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+HF_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 
 def call_llm_api(prompt: str):
     """Calls the OpenRouter API to get a response from the LLM."""
