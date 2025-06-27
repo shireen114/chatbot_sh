@@ -162,10 +162,5 @@ Question:
 
 
 if __name__ == '__main__':
-    # تأكد من أن لديك ملف index.html في مجلد templates
-    # Ensure you have an index.html file in a 'templates' folder
-    if not os.path.exists(os.path.join(SCRIPT_DIR, 'templates', 'index.html')):
-        print("\nWARNING: 'templates/index.html' not found.")
-        print("Please create a 'templates' folder and an 'index.html' file inside it for the chat interface.\n")
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
